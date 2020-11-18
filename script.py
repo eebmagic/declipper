@@ -4,14 +4,6 @@ import array
 import time
 
 
-def amp(data, increase):
-    return data * increase
-
-
-def cutoff_max(data, cutoff):
-    return np.clip(data, -cutoff, cutoff)
-
-
 def abreviate(data, rate):
     new = []
     for ind, point in enumerate(data):
@@ -20,6 +12,11 @@ def abreviate(data, rate):
 
     return new
 
+###########################
+### SETTINGS ###
+AMP_FACTOR = 1.1
+CUTOFF_REDUCTION = 0.6
+###########################
 
 start = time.time()
 
@@ -34,11 +31,12 @@ both = np.array(both)
 print(f"{time.time() - start}\t: load samples")
 
 # Amplify samples
-amped = amp(both, 1.1)
+amped = both * AMP_FACTOR
 print(f"{time.time() - start}\t: amplify samples")
 
 # Cutoff samples
-cut = cutoff_max(amped, int(max(both) * 0.6))
+cutoff = int(max(both) * CUTOFF_REDUCTION)
+cut = np.clip(amped, -cutoff, cutoff)
 cut = cut.astype('int64')
 print(f"{time.time() - start}\t: cutoff samples")
 
@@ -60,4 +58,4 @@ output_file = "OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
 new.export(output_file, format="wav")
 print(f"{time.time() - start}\t: export file")
 
-print(f"\nFINISHED EXPORT: {output_file}")
+print(f"\n ### FINISHED EXPORT: {output_file}")
