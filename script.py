@@ -19,7 +19,7 @@ def split_channels(s):
 
 
 def amp(data, increase):
-    new = [point* increase for point in data]
+    new = [int(point * increase) for point in data]
     return new
 
 
@@ -62,6 +62,7 @@ print(f"{channel_sample_size = }")
 
 
 left, right = split_channels(sound)
+both = sound.get_array_of_samples()
 
 print(f"\n{len(left) = }")
 print(f"{len(right) = }")
@@ -73,25 +74,24 @@ print(max(right))
 print(min(left))
 print(min(right))
 
-amped = amp(left, 0.1)
-cut = cutoff_max(amped, max(left) * 0.8)
-
-
-## Optionally graph the change
-# from matplotlib import pyplot as plt
-# abrev_rate = 100
-# abrev_size = len(left) // 5
-# abrev_left = abreviate(left[:abrev_size], abrev_rate)
-# abrev_cut = abreviate(cut[:abrev_size], abrev_rate)
-
-# plt.plot(abrev_cut, color='red')
-# plt.plot(abrev_left, color='black')
-# plt.show()
+amped = amp(both, 1.1)
+cut = cutoff_max(amped, int(max(both) * 0.6))
 
 
 ## This Works!!
+# new = AudioSegment(
+#     data=sound.get_array_of_samples(),
+#     frame_rate = sound.frame_rate,
+#     sample_width=2,
+#     channels=2
+# )
+
+import array
+print(type(sound.get_array_of_samples()[0]), type(cut[0]))
+cut = array.array(sound.array_type, cut)
+print(type(sound.get_array_of_samples()), type(cut))
 new = AudioSegment(
-    data=sound.get_array_of_samples(),
+    data=cut,
     frame_rate = sound.frame_rate,
     sample_width=2,
     channels=2
@@ -99,4 +99,4 @@ new = AudioSegment(
 
 # new.export("OUTPUT.mp3", format="mp3", bitrate='8k')
 new.export("OUTPUT.wav", format="wav")
-print("FINISHED EXPORT: OUTPUT.mp3")
+print("FINISHED EXPORT: OUTPUT.wav")

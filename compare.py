@@ -13,8 +13,9 @@ created_samples = created.get_array_of_samples()
 
 print(len(original_samples), len(created_samples), len(original_samples) == len(created_samples))
 
-graph_size = 1000
-plt.plot(created_samples[:graph_size], color='red', label='created')
-plt.plot(original_samples[:graph_size], color='black', label='original')
+graph_size = len(original_samples) // 7
+start = graph_size // 2
+plt.plot(original_samples[start:graph_size], color='black', label='original')
+plt.plot(created_samples[start:graph_size], color='red', label='created')
 plt.legend()
 plt.show()
