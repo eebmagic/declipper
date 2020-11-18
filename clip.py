@@ -53,7 +53,7 @@ for input_file in os.listdir(source_dir):
     print(f"{time.time() - start}\t: build new sound")
 
     # Export OUTPUT_ file
-    output_file = "outputs/OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
+    output_file = "outputs/OUTPUT_" + input_file.split('/')[-1].replace('.mp3', '.wav')
     new.export(output_file, format="wav")
     print(f"{time.time() - start}\t: export file")
 
