@@ -1,16 +1,9 @@
 from pydub import AudioSegment
 import numpy as np
 import array
+import os
 import time
 
-
-def abreviate(data, rate):
-    new = []
-    for ind, point in enumerate(data):
-        if ind % rate == 0:
-            new.append(point)
-
-    return new
 
 ###########################
 ### SETTINGS ###
@@ -18,44 +11,50 @@ AMP_FACTOR = 1.1
 CUTOFF_REDUCTION = 0.6
 ###########################
 
-start = time.time()
+files = os.listdir('sources')
 
-# Load file
-input_file = "sources/greater_than_four_chords.mp3"
-sound = AudioSegment.from_file(input_file)
-print(f"{time.time() - start}\t: load sound")
+source_dir = 'sources/'
+for input_file in os.listdir(source_dir):
+    start = time.time()
 
-# Load samples
-both = sound.get_array_of_samples()
-both = np.array(both)
-print(f"{time.time() - start}\t: load samples")
+    # Load file
+    # input_file = "sources/greater_than_four_chords.mp3"
+    input_file = "sources/" + input_file
+    print(f"### STARTING FILE: {input_file}")
+    sound = AudioSegment.from_file(input_file)
+    print(f"{time.time() - start}\t: load sound")
 
-# Amplify samples
-amped = both * AMP_FACTOR
-print(f"{time.time() - start}\t: amplify samples")
+    # Load samples
+    both = sound.get_array_of_samples()
+    both = np.array(both)
+    print(f"{time.time() - start}\t: load samples")
 
-# Cutoff samples
-cutoff = int(max(both) * CUTOFF_REDUCTION)
-cut = np.clip(amped, -cutoff, cutoff)
-cut = cut.astype('int64')
-print(f"{time.time() - start}\t: cutoff samples")
+    # Amplify samples
+    amped = both * AMP_FACTOR
+    print(f"{time.time() - start}\t: amplify samples")
 
-# Convert numpy.array to array.array
-cut = array.array(sound.array_type, cut)
-print(f"{time.time() - start}\t: put samples in array")
+    # Cutoff samples
+    cutoff = int(max(both) * CUTOFF_REDUCTION)
+    cut = np.clip(amped, -cutoff, cutoff)
+    cut = cut.astype('int64')
+    print(f"{time.time() - start}\t: cutoff samples")
 
-# Build new sound object
-new = AudioSegment(
-    data=cut,
-    frame_rate = sound.frame_rate,
-    sample_width=2,
-    channels=2
-)
-print(f"{time.time() - start}\t: build new sound")
+    # Convert numpy.array to array.array
+    cut = array.array(sound.array_type, cut)
+    print(f"{time.time() - start}\t: put samples in array")
 
-# Export OUTPUT_ file
-output_file = "OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
-new.export(output_file, format="wav")
-print(f"{time.time() - start}\t: export file")
+    # Build new sound object
+    new = AudioSegment(
+        data=cut,
+        frame_rate = sound.frame_rate,
+        sample_width=2,
+        channels=2
+    )
+    print(f"{time.time() - start}\t: build new sound")
 
-print(f"\n ### FINISHED EXPORT: {output_file}")
+    # Export OUTPUT_ file
+    output_file = "outputs/OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
+    new.export(output_file, format="wav")
+    print(f"{time.time() - start}\t: export file")
+
+    print(f"\n ### FINISHED EXPORT: {output_file}\n")
