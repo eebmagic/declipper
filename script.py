@@ -1,6 +1,7 @@
 from pydub import AudioSegment
-import time
 import numpy as np
+import array
+import time
 
 def split_channels(s):
     arr = s.get_array_of_samples()
@@ -47,56 +48,34 @@ def abreviate(data, rate):
     return new
 
 
-sound = AudioSegment.from_file("sources/sax_waves.wav")
-samples = sound.get_array_of_samples()
+start = time.time()
 
-print(f"{len(samples) = }")
+input_file = "sources/greater_than_four_chords.mp3"
+sound = AudioSegment.from_file(input_file)
+print(f"{time.time() - start}\t: load sound")
 
-rate = 44_100 # MHz
-length = 72 # seconds
-full_sample_size = rate * length * sound.channels
-channel_sample_size = rate * length
-
-print(f"{full_sample_size = }")
-print(f"{channel_sample_size = }")
-
-
-left, right = split_channels(sound)
 both = sound.get_array_of_samples()
-
-print(f"\n{len(left) = }")
-print(f"{len(right) = }")
-print(type(left))
-
-print(left[:100])
-print(max(left))
-print(max(right))
-print(min(left))
-print(min(right))
-
+print(f"{time.time() - start}\t: load samples")
 amped = amp(both, 1.1)
+print(f"{time.time() - start}\t: amplify samples")
 cut = cutoff_max(amped, int(max(both) * 0.6))
-
-
-## This Works!!
-# new = AudioSegment(
-#     data=sound.get_array_of_samples(),
-#     frame_rate = sound.frame_rate,
-#     sample_width=2,
-#     channels=2
-# )
-
-import array
-print(type(sound.get_array_of_samples()[0]), type(cut[0]))
+print(f"{time.time() - start}\t: cutoff samples")
 cut = array.array(sound.array_type, cut)
-print(type(sound.get_array_of_samples()), type(cut))
+print(f"{time.time() - start}\t: put samples in array")
+
 new = AudioSegment(
     data=cut,
     frame_rate = sound.frame_rate,
     sample_width=2,
     channels=2
 )
+print(f"{time.time() - start}\t: build new sound")
 
-# new.export("OUTPUT.mp3", format="mp3", bitrate='8k')
-new.export("OUTPUT.wav", format="wav")
-print("FINISHED EXPORT: OUTPUT.wav")
+# print("Original sample size: " + '{:,}'.format(len(both)))
+# print("Output sample size: " + '{:,}'.format(len(new.get_array_of_samples())))
+
+output_file = "OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
+
+new.export(output_file, format="wav")
+print(f"{time.time() - start}\t: export file")
+print(f"FINISHED EXPORT: {output_file}")
