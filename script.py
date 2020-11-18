@@ -20,23 +20,26 @@ def split_channels(s):
 
 
 def amp(data, increase):
-    new = [int(point * increase) for point in data]
-    return new
+    # new = [int(point * increase) for point in data]
+    # return new
+    return data * increase
 
 
 def cutoff_max(data, cutoff):
-    cutoff = abs(cutoff)
-    new = []
-    for point in data:
-        if abs(point) > cutoff:
-            if point > 0:
-                new.append(cutoff)
-            else:
-                new.append(-cutoff)
-        else:
-            new.append(point)
+    # cutoff = abs(cutoff)
+    # new = []
+    # for point in data:
+    #     if abs(point) > cutoff:
+    #         if point > 0:
+    #             new.append(cutoff)
+    #         else:
+    #             new.append(-cutoff)
+    #     else:
+    #         new.append(point)
 
-    return new
+    # return new
+
+    return np.clip(data, -cutoff, cutoff)
 
 
 def abreviate(data, rate):
@@ -55,10 +58,12 @@ sound = AudioSegment.from_file(input_file)
 print(f"{time.time() - start}\t: load sound")
 
 both = sound.get_array_of_samples()
+both = np.array(both)
 print(f"{time.time() - start}\t: load samples")
 amped = amp(both, 1.1)
 print(f"{time.time() - start}\t: amplify samples")
 cut = cutoff_max(amped, int(max(both) * 0.6))
+cut = cut.astype('int64')
 print(f"{time.time() - start}\t: cutoff samples")
 cut = array.array(sound.array_type, cut)
 print(f"{time.time() - start}\t: put samples in array")
@@ -78,4 +83,4 @@ output_file = "OUTPUT_" + input_file.split('/')[-1].split('.')[0] + ".wav"
 
 new.export(output_file, format="wav")
 print(f"{time.time() - start}\t: export file")
-print(f"FINISHED EXPORT: {output_file}")
+print(f"\nFINISHED EXPORT: {output_file}")
