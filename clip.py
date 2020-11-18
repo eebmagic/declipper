@@ -11,9 +11,9 @@ AMP_FACTOR = 1.1
 CUTOFF_REDUCTION = 0.6
 ###########################
 
-files = os.listdir('sources')
-
 source_dir = 'sources/'
+files = os.listdir(source_dir)
+
 for input_file in os.listdir(source_dir):
     start = time.time()
 
