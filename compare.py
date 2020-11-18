@@ -1,21 +1,45 @@
 from pydub import AudioSegment
 import numpy as np
 from matplotlib import pyplot as plt
+import sys
+
+def abreviate(data, rate=100):
+    new = []
+    for ind, point in enumerate(data):
+        if ind % rate == 0:
+            new.append(point)
+
+    return new
 
 
-original = AudioSegment.from_file("sources/sax_waves.wav")
-created = AudioSegment.from_file("OUTPUT.wav")
 
+acceptable_filetypes = ["mp3", "wav"]
 
-original_samples = original.get_array_of_samples()
-created_samples = created.get_array_of_samples()
+file_a = None
+file_b = None
+for entry in sys.argv:
+    if entry.split('.')[-1] in acceptable_filetypes:
+        if not file_a and not file_b:
+            file_a = entry
+        elif file_a and not file_b:
+            file_b = entry
 
+original = AudioSegment.from_file(file_a)
+created = AudioSegment.from_file(file_b)
 
-print(len(original_samples), len(created_samples), len(original_samples) == len(created_samples))
+original_samples = abreviate(original.get_array_of_samples())
+created_samples = abreviate(created.get_array_of_samples())
 
-graph_size = len(original_samples) // 7
-start = graph_size // 2
-plt.plot(original_samples[start:graph_size], color='black', label='original')
-plt.plot(created_samples[start:graph_size], color='red', label='created')
+len_a = len(original_samples)
+len_b = len(created_samples)
+print(len_a, len_b, f"lengths match: {len_a == len_b}")
+
+end = len(original_samples) // 3
+start = 0
+total_points = len(original_samples[start:end])
+print(f"{total_points = }")
+
+plt.plot(original_samples[start:end], color='black', label='original')
+plt.plot(created_samples[start:end], color='red', label='created')
 plt.legend()
 plt.show()
